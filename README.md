@@ -1,51 +1,152 @@
-# Multiplicação Matriz-Vetor Distribuída com MPI
+# README — Multiplicação de Matriz por Vetor (Sequencial e MPI)
 
-## Descrição do Projeto
+Este projeto implementa o problema matriz × vetor em duas versões:
 
-Este projeto consiste na implementação de um algoritmo de **multiplicação matriz-vetor**, desenvolvido inicialmente de forma **sequencial** e posteriormente adaptado para uma versão **distribuída**, utilizando a biblioteca **MPI (Message Passing Interface)** em **C/C++**.
+- **Versão sequencial em C++**
+- **Versão distribuída usando MPI**
 
-O objetivo principal foi explorar conceitos de **computação distribuída**, avaliando o impacto da paralelização na performance do algoritmo por meio da análise de **speedup, eficiência e escalabilidade**, considerando diferentes tamanhos de entrada e quantidades de processos.
-
----
-
-## Funcionalidades
-
-- Implementação sequencial da multiplicação matriz-vetor  
-- Implementação distribuída utilizando MPI  
-- Distribuição de carga entre processos  
-- Comunicação entre processos via troca de mensagens  
-- Execução com diferentes números de processos  
-- Medição de tempo de execução  
-- Cálculo de speedup, eficiência e escalabilidade  
+O objetivo é medir tempo de execução, speedup, eficiência e escalabilidade.
 
 ---
 
-## Tecnologias Utilizadas
+## 1. Requisitos
 
-- Linguagem C/C++  
-- MPI (Message Passing Interface)  
-- Computação distribuída  
-- Programação paralela  
+### Para compilar e rodar
 
----
+- **GCC / G++**
+- **OpenMPI instalado**
+- **WSL2 recomendado** (Linux)
 
-## Metodologia
-
-O desenvolvimento do projeto seguiu as seguintes etapas:
-
-1. Implementação da versão sequencial do algoritmo  
-2. Identificação das regiões paralelizáveis  
-3. Implementação da versão distribuída com MPI  
-4. Execução de testes com diferentes tamanhos de entrada  
-5. Execução com múltiplos processos (1, 2, 4, 8, ...)  
-6. Coleta de métricas de desempenho  
-7. Análise de speedup, eficiência e escalabilidade  
-
----
-
-## Compilação
-
-Para compilar o projeto, é necessário ter uma implementação de MPI instalada (como OpenMPI ou MPICH).
+### Verificar se MPI está instalado
 
 ```bash
-mpicc matriz_vetor.c -o matriz_vetor
+mpirun --version
+mpicc --version
+```
+
+---
+
+## 2. Compilar os códigos
+
+### Versão Sequencial
+
+```bash
+g++ seq_matvec.cpp -O2 -o seq
+```
+
+### Versão MPI
+
+```bash
+mpic++ mpi_matvec.cpp -O2 -o mpi_matvec  (killed)
+```
+
+---
+
+## 3. Executar os programas
+
+### Sequencial
+
+```bash
+./seq 1000
+```
+
+Onde `1000` é o tamanho N da matriz (N×N) e do vetor.
+
+### MPI
+
+```bash
+mpirun -np <processos> ./mpi_matvec <N>
+```
+````bash
+mpirun -np (P)  --oversubscribe ./mpi_matvec (N)
+```
+
+**Exemplos:**
+
+```bash
+mpirun -np 1 ./mpi_matvec 1000
+mpirun -np 2 ./mpi_matvec 1000
+mpirun -np 4 ./mpi_matvec 1000
+mpirun -np 8 ./mpi_matvec 1000
+```
+
+---
+
+## 📌 4. Sobre "-np"
+
+O parâmetro:
+
+```bash
+-np X
+```
+
+significa **quantos processos paralelos MPI** serão criados.
+
+**Exemplos:**
+
+- `-np 1` → código roda igual ao sequencial
+- `-np 2` → 2 processos MPI
+- `-np 4` → 4 processos MPI
+- `-np 8` → 8 processos MPI
+
+---
+
+## 5. Aviso sobre limites de processos no WSL
+
+**WSL geralmente permite até 8 processos MPI** sem travar ou falhar.
+
+Mais que isso tende a dar erro:
+
+- Falta de memória
+- Limitação de CPU virtual
+- Falta de slots no OpenMPI do WSL
+
+Por isso os testes são feitos com:
+
+- **1, 2, 4, 8 processos**
+
+---
+
+## 6. Como medir o tempo e gerar métricas
+
+Para cada valor de N (ex.: 500, 1000, 2000):
+
+1. **Rode 5 vezes o sequencial**
+2. **Calcule a média**
+
+Depois:
+
+1. **Rode MPI com:**
+   - `np = 1, 2, 4, 8`
+2. **Para cada np, rode 5 vezes**
+3. **Calcule a média**
+
+---
+
+## 7. Métricas para o relatório
+
+### Speedup
+
+$$S = \frac{T_{seq}}{T_{par}}$$
+
+### Eficiência
+
+$$E = \frac{S}{p}$$
+
+### Escalabilidade
+
+Comparar o speedup com diferentes valores de p.
+
+---
+
+## 8. Recomendações de teste
+
+### Use tamanhos:
+
+- `N = 500`
+- `N = 1000`
+- `N = 2000`
+
+### Processos:
+
+- `1, 2, 4, 8`

@@ -1,4 +1,4 @@
-# README — Multiplicação de Matriz por Vetor (Sequencial e MPI)
+#  Multiplicação de Matriz por Vetor (Sequencial e MPI)
 
 Este projeto implementa o problema matriz × vetor em duas versões:
 
